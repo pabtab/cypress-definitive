@@ -31,21 +31,33 @@ describe("contact form", () => {
     cy.get('[data-cy="contact-input-message"]').blur();
     cy.get('[data-cy="contact-input-message"]')
       .parent()
-      .then((el) => {
-        expect(el.attr("class")).to.contains("invalid");
-      });
+      .should("have.attr", "class")
+      .and("match", /invalid/);
+
+    // THis wont work on run
+    // .then((el) => {
+    //   expect(el.attr("class")).to.contains("invalid");
+    // });
 
     cy.get('[data-cy="contact-input-email"]').focus().blur();
     cy.get('[data-cy="contact-input-email"]')
       .parent()
-      .then((el) => {
-        expect(el.attr("class")).to.contains("invalid");
-      });
+      .should("have.attr", "class")
+      .and("match", /invalid/);
+    // .then((el) => {
+    //   expect(el.attr("class")).to.contains("invalid");
+    // });
 
     cy.get('[data-cy="contact-input-name"]').focus().blur();
     cy.get('[data-cy="contact-input-name"]')
       .parent()
-      .then((el) => {
+      // .should("have.attr", "class")
+      // .and("match", /invalid/);
+      // .then((el) => {
+      //   expect(el.attr("class")).to.contains("invalid");
+      // });
+      .should((el) => {
+        expect(el.attr("class")).not.be.undefined;
         expect(el.attr("class")).to.contains("invalid");
       });
   });
