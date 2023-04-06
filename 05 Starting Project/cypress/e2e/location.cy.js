@@ -2,6 +2,7 @@
 
 describe("share location", () => {
   beforeEach(() => {
+    cy.clock(); // Manipulate the clock before test runs
     // Mock data an use everywhere using alias
     cy.fixture("user-location.json").as("userLocation");
     cy.visit("/").then((win) => {
@@ -17,6 +18,8 @@ describe("share location", () => {
       });
 
       cy.stub(win.navigator.clipboard, "writeText").as("saveToClipboard").resolves();
+      cy.spy(win.localStorage, "getItem").as("getStoredLocation");
+      cy.spy(win.localStorage, "setItem").as("storeLocation");
     });
   });
   it("should fetch the user location", () => {
@@ -38,8 +41,23 @@ describe("share location", () => {
         "have.been.calledWithMatch",
         new RegExp(`${latitude}.${longitude}.${encodeURI("goku")}`)
       );
+      cy.get("@storeLocation").should(
+        "have.been.calledWithMatch",
+        /goku/,
+        new RegExp(`${latitude}.${longitude}.${encodeURI("goku")}`)
+      );
     });
+    cy.get("@storeLocation").should("have.been.called");
+    cy.get('[data-cy="share-loc-btn"]').click();
+    cy.get("@getStoredLocation").should("have.been.called");
 
-    cy.get('[data-cy="info-message"] > p');
+    cy.get('[data-cy="info-message"]').should("be.visible");
+    cy.get('[data-cy="info-message"]').should("have.class", "visible");
+
+    // Manipulate the clock - initiate clock begining
+    cy.tick(2000); //skip 2 seconds
+
+    // 4 Seconds default timer to get a value
+    cy.get('[data-cy="info-message"]').should("not.be.visible");
   });
 });
